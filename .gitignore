@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.DS_Store
+
+# Keep the uploads/ folder in git, but not the files temporarily saved into it
+uploads/*
+!uploads/.gitkeep

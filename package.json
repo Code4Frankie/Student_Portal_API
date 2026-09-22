@@ -1,0 +1,29 @@
+{
+  "name": "student-portal-api",
+  "version": "1.0.0",
+  "description": "A Student Portal REST API for managing student accounts (CRUD) with ownership-restricted access.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "student",
+    "portal",
+    "api",
+    "express",
+    "rest"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cloudinary": "^2.11.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.4.0"
+  }
+}

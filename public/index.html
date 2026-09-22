@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Portal API — Test Console</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --border: #e1e4e8;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --danger: #dc2626;
+    --danger-hover: #b91c1c;
+    --success: #16a34a;
+    --error-bg: #fef2f2;
+    --error-text: #991b1b;
+    --ok-bg: #f0fdf4;
+    --ok-text: #166534;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 2rem 1rem 4rem;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+  p.subtitle { color: var(--muted); margin-top: 0; margin-bottom: 2rem; font-size: 0.9rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  @media (min-width: 980px) {
+    .grid { grid-template-columns: 1fr 1fr; max-width: 1000px; }
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  .card h2 { font-size: 1.05rem; margin-top: 0; margin-bottom: 1rem; }
+  label { display: block; font-size: 0.8rem; font-weight: 600; margin: 0.75rem 0 0.25rem; color: #374151; }
+  input[type="text"], input[type="email"], input[type="file"] {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  button {
+    margin-top: 1rem;
+    padding: 0.55rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    background: var(--accent);
+  }
+  button:hover { background: var(--accent-hover); }
+  button.danger { background: var(--danger); }
+  button.danger:hover { background: var(--danger-hover); }
+  button + button { margin-left: 0.5rem; }
+  .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  pre.result {
+    margin-top: 1rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .banner {
+    margin-top: 1rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  .banner.ok { background: var(--ok-bg); color: var(--ok-text); }
+  .banner.error { background: var(--error-bg); color: var(--error-text); }
+  .profile-pic {
+    margin-top: 0.75rem;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    display: block;
+  }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+  code.hint { background: #eef2ff; padding: 0.1rem 0.3rem; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h1>Student Portal API — Test Console</h1>
+  <p class="subtitle">
+    A minimal GUI for manually exercising the API. Prefer Postman? Use the same
+    <code class="hint">/api/students</code> endpoints directly with the same fields.
+  </p>
+
+  <div class="grid">
+
+    <!-- CREATE -->
+    <div class="card">
+      <h2>1. Create account</h2>
+      <form id="createForm">
+        <label for="c-name">Name</label>
+        <input type="text" id="c-name" required />
+
+        <label for="c-regNo">Registration number</label>
+        <input type="text" id="c-regNo" required />
+
+        <label for="c-email">Email</label>
+        <input type="email" id="c-email" required />
+
+        <label for="c-picture">Profile picture (optional)</label>
+        <input type="file" id="c-picture" accept="image/*" />
+
+        <button type="submit">Create account</button>
+      </form>
+      <div id="createBanner"></div>
+      <img id="createPreview" class="profile-pic" style="display:none" />
+      <pre class="result" id="createResult" style="display:none"></pre>
+    </div>
+
+    <!-- GET / UPDATE / DELETE -->
+    <div class="card">
+      <h2>2. Manage an account</h2>
+      <p class="hint">Filled in automatically after you create an account above — or paste in your own.</p>
+
+      <label for="m-id">Student ID</label>
+      <input type="text" id="m-id" />
+
+      <label for="m-token">Auth token</label>
+      <input type="text" id="m-token" />
+
+      <div class="row">
+        <button id="getBtn" type="button">Get details</button>
+        <button id="deleteBtn" type="button" class="danger">Delete account</button>
+      </div>
+
+      <hr style="margin: 1.25rem 0; border: none; border-top: 1px solid var(--border);" />
+
+      <form id="updateForm">
+        <label for="u-name">New name</label>
+        <input type="text" id="u-name" placeholder="Only name is editable" />
+
+        <label for="u-picture">New profile picture (optional)</label>
+        <input type="file" id="u-picture" accept="image/*" />
+
+        <button type="submit">Update profile</button>
+      </form>
+
+      <div id="manageBanner"></div>
+      <img id="managePreview" class="profile-pic" style="display:none" />
+      <pre class="result" id="manageResult" style="display:none"></pre>
+    </div>
+
+  </div>
+
+<script>
+  const API_BASE = '/api/students';
+
+  function showBanner(el, message, isError) {
+    el.innerHTML = `<div class="banner ${isError ? 'error' : 'ok'}">${message}</div>`;
+  }
+  function clearBanner(el) { el.innerHTML = ''; }
+  function showResult(el, data) {
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+  }
+  function showPreview(imgEl, url) {
+    if (url) {
+      imgEl.src = url;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.style.display = 'none';
+    }
+  }
+
+  // ---- Create ----
+  const createForm = document.getElementById('createForm');
+  const createBanner = document.getElementById('createBanner');
+  const createResult = document.getElementById('createResult');
+  const createPreview = document.getElementById('createPreview');
+
+  createForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearBanner(createBanner);
+    createResult.style.display = 'none';
+    showPreview(createPreview, null);
+
+    const formData = new FormData();
+    formData.append('name', document.getElementById('c-name').value);
+    formData.append('regNo', document.getElementById('c-regNo').value);
+    formData.append('email', document.getElementById('c-email').value);
+    const file = document.getElementById('c-picture').files[0];
+    if (file) formData.append('profilePicture', file);
+
+    try {
+      const res = await fetch(API_BASE, { method: 'POST', body: formData });
+      const data = await res.json();
+      showResult(createResult, data);
+
+      if (res.ok) {
+        showBanner(createBanner, 'Account created. ID and token copied into the panel on the right →', false);
+        document.getElementById('m-id').value = data.student.id;
+        document.getElementById('m-token').value = data.token;
+        showPreview(createPreview, data.student.profilePicture);
+      } else {
+        showBanner(createBanner, data.error || (data.errors || []).join(' ') || 'Something went wrong.', true);
+      }
+    } catch (err) {
+      showBanner(createBanner, 'Network error: ' + err.message, true);
+    }
+  });
+
+  // ---- Manage (get / update / delete) ----
+  const manageBanner = document.getElementById('manageBanner');
+  const manageResult = document.getElementById('manageResult');
+  const managePreview = document.getElementById('managePreview');
+
+  function authHeaders() {
+    const token = document.getElementById('m-token').value.trim();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+  function currentId() {
+    return document.getElementById('m-id').value.trim();
+  }
+
+  document.getElementById('getBtn').addEventListener('click', async () => {
+    clearBanner(manageBanner);
+    manageResult.style.display = 'none';
+    showPreview(managePreview, null);
+    const id = currentId();
+    if (!id) return showBanner(manageBanner, 'Enter a student ID first.', true);
+
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, { headers: authHeaders() });
+      const data = await res.json();
+      showResult(manageResult, data);
+      if (res.ok) {
+        showBanner(manageBanner, 'Fetched successfully.', false);
+        showPreview(managePreview, data.student.profilePicture);
+      } else {
+        showBanner(manageBanner, data.error || 'Request failed.', true);
+      }
+    } catch (err) {
+      showBanner(manageBanner, 'Network error: ' + err.message, true);
+    }
+  });
+
+  document.getElementById('updateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearBanner(manageBanner);
+    manageResult.style.display = 'none';
+    const id = currentId();
+    if (!id) return showBanner(manageBanner, 'Enter a student ID first.', true);
+
+    const formData = new FormData();
+    formData.append('name', document.getElementById('u-name').value);
+    const file = document.getElementById('u-picture').files[0];
+    if (file) formData.append('profilePicture', file);
+
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: formData,
+      });
+      const data = await res.json();
+      showResult(manageResult, data);
+      if (res.ok) {
+        showBanner(manageBanner, 'Profile updated.', false);
+        showPreview(managePreview, data.student.profilePicture);
+      } else {
+        showBanner(manageBanner, data.error || 'Request failed.', true);
+      }
+    } catch (err) {
+      showBanner(manageBanner, 'Network error: ' + err.message, true);
+    }
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    clearBanner(manageBanner);
+    manageResult.style.display = 'none';
+    showPreview(managePreview, null);
+    const id = currentId();
+    if (!id) return showBanner(manageBanner, 'Enter a student ID first.', true);
+    if (!confirm('Permanently delete this account?')) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE', headers: authHeaders() });
+      const data = await res.json();
+      showResult(manageResult, data);
+      if (res.ok) {
+        showBanner(manageBanner, 'Account deleted.', false);
+        document.getElementById('m-id').value = '';
+        document.getElementById('m-token').value = '';
+      } else {
+        showBanner(manageBanner, data.error || 'Request failed.', true);
+      }
+    } catch (err) {
+      showBanner(manageBanner, 'Network error: ' + err.message, true);
+    }
+  });
+</script>
+</body>
+</html>

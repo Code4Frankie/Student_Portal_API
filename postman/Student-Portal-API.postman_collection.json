@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "Student Portal API",
+    "description": "CRUD endpoints for the Student Portal API. Set the `baseUrl` collection variable to your local server (http://localhost:3000) or your deployed Render URL. Running 'Create Student' automatically fills in `studentId` and `token` for the requests below it.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "studentId", "value": "", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "Create Student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const data = pm.response.json();",
+              "  pm.collectionVariables.set('studentId', data.student.id);",
+              "  pm.collectionVariables.set('token', data.token);",
+              "  console.log('Saved studentId and token to collection variables.');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": { "raw": "{{baseUrl}}/api/students", "host": ["{{baseUrl}}"], "path": ["api", "students"] },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Ada Lovelace", "type": "text" },
+            { "key": "regNo", "value": "REG-2026-001", "type": "text" },
+            { "key": "email", "value": "ada@example.com", "type": "text" },
+            { "key": "profilePicture", "type": "file", "src": [], "disabled": true }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Student (own details)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/students/{{studentId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "students", "{{studentId}}"]
+        },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }
+      }
+    },
+    {
+      "name": "Update Student (name / picture)",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{baseUrl}}/api/students/{{studentId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "students", "{{studentId}}"]
+        },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Ada King", "type": "text" },
+            { "key": "profilePicture", "type": "file", "src": [], "disabled": true }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Student — rejected (change email)",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{baseUrl}}/api/students/{{studentId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "students", "{{studentId}}"]
+        },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Ada King", "type": "text" },
+            { "key": "email", "value": "someone-else@example.com", "type": "text" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Student",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/students/{{studentId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "students", "{{studentId}}"]
+        },
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] }
+      }
+    }
+  ]
+}
